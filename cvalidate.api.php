@@ -182,14 +182,17 @@ function cvalidate_address($full_address) {
     return FALSE;
   }
   $full_address = str_replace(
-    array('台北縣', '台北市','台中市', '台中縣', '台南市', '台南縣', '台東市', '台東縣'),
-    array('臺北縣', '臺北市','臺中市', '臺中縣', '臺南市', '臺南縣', '臺東市', '臺東縣'),
+    //把台換成臺
+    array('台北縣', '台北市','台中市','台中縣', '台南市', '台南縣', '台東市', '台東縣'),
+    array('臺北縣', '臺北市','臺中市','臺中縣', '臺南市', '臺南縣', '臺東市', '臺東縣'),
     $full_address
   );
-  $full_address = preg_replace('/((台北縣|桃園縣|台中縣|台南縣|高雄縣).+)(市|鄉|鎮)/','$1區', $full_address);
+  //把五都的鄉鎮市換成區
+  $full_address = preg_replace('/((臺北縣|桃園縣|臺中縣|臺南縣|高雄縣).+)(市|鄉|鎮)/','$1區', $full_address);
   $full_address = str_replace(
-    array('台北縣','桃園縣','台中縣','台南縣','高雄縣'),
-    array('新北市', '桃園市', '台中市','台南市','高雄市'),
+    //把五都升格
+    array('臺北縣','桃園縣','臺中縣','臺南縣','高雄縣'),
+    array('新北市', '桃園市', '臺中市','臺南市','高雄市'),
     $full_address
   );
   $returns = array(
@@ -218,13 +221,41 @@ function cvalidate_address($full_address) {
     $returns['region'] = key($ary);
   }
   else{
+    //切出三字的區，如：中正區，避免平鎮區、前鎮區被鎮切開
     $matches = array();
-    preg_match('/^(.{2}(?:市|縣))(.{2,4}(?:鄉|鎮|市|區))/u', $full_address, $matches);
+    preg_match('/^(.{2}(?:市|縣))(.{2}(?:區))/u', $full_address, $matches);
     if(!empty($matches[1])){
       $returns['city'] = $matches[1];
     }
     if(!empty($matches[2])){
       $returns['region'] = $matches[2];
+    }else{
+      //切出二字的鄉鎮市區，如：東區
+      preg_match('/^(.{2}(?:市|縣))(.{1}(?:鄉|鎮|市|區))/u', $full_address, $matches);
+      if(!empty($matches[1])){
+        $returns['city'] = $matches[1];
+      }
+      if(!empty($matches[2])){
+        $returns['region'] = $matches[2];
+      }else{
+        //切出三字的鄉鎮市區
+        preg_match('/^(.{2}(?:市|縣))(.{2}(?:鄉|鎮|市|區))/u', $full_address, $matches);
+        if(!empty($matches[1])){
+          $returns['city'] = $matches[1];
+        }
+        if(!empty($matches[2])){
+          $returns['region'] = $matches[2];
+        }else{
+          //切出四字的鄉鎮市區，如：那瑪夏區
+          preg_match('/^(.{2}(?:市|縣))(.{3}(?:鄉|鎮|市|區))/u', $full_address, $matches);
+          if(!empty($matches[1])){
+            $returns['city'] = $matches[1];
+          }
+          if(!empty($matches[2])){
+            $returns['region'] = $matches[2];
+          }
+        }
+      }
     }
     if (empty($returns['zip'])) {
       $returns['zip'] = _cvalidate_zip(NULL, $returns['city'], $returns['region']);
@@ -332,7 +363,7 @@ function _cvalidate_zip($code = NULL, $city = NULL, $region = NULL){
 270=>array('蘇澳鎮'=>'宜蘭縣',),
 272=>array('南澳鄉'=>'宜蘭縣',),
 290=>array('釣魚台列嶼'=>'宜蘭縣',),
-300=>array('新竹市'=>'新竹市',),
+300=>array('新竹市'=>'新竹市', '香山區'=>'新竹市','東區'=>'新竹市', '北區'=>'新竹市',),
 302=>array('竹北市'=>'新竹縣',),
 303=>array('湖口鄉'=>'新竹縣',),
 304=>array('新豐鄉'=>'新竹縣',),
@@ -415,7 +446,7 @@ function _cvalidate_zip($code = NULL, $city = NULL, $region = NULL){
 507=>array('線西鄉'=>'彰化縣',),
 508=>array('和美鎮'=>'彰化縣',),
 509=>array('伸港鄉'=>'彰化縣',),
-510=>array('員林鎮'=>'彰化縣',),
+510=>array('員林市'=>'彰化縣',),
 511=>array('社頭鄉'=>'彰化縣',),
 512=>array('永靖鄉'=>'彰化縣',),
 513=>array('埔心鄉'=>'彰化縣',),
@@ -445,7 +476,7 @@ function _cvalidate_zip($code = NULL, $city = NULL, $region = NULL){
 556=>array('信義鄉'=>'南投縣',),
 557=>array('竹山鎮'=>'南投縣',),
 558=>array('鹿谷鄉'=>'南投縣',),
-600=>array('嘉義市'=>'嘉義市',),
+600=>array('嘉義市'=>'嘉義市','東區'=>'嘉義市','西區'=>'嘉義市',),
 602=>array('番路鄉'=>'嘉義縣',),
 603=>array('梅山鄉'=>'嘉義縣',),
 604=>array('竹崎鄉'=>'嘉義縣',),
@@ -543,7 +574,7 @@ function _cvalidate_zip($code = NULL, $city = NULL, $region = NULL){
 826=>array('梓官區'=>'高雄市',),
 827=>array('彌陀區'=>'高雄市',),
 828=>array('永安區'=>'高雄市',),
-829=>array('湖內鄉'=>'高雄市',),
+829=>array('湖內區'=>'高雄市',),
 830=>array('鳳山區'=>'高雄市',),
 831=>array('大寮區'=>'高雄市',),
 832=>array('林園區'=>'高雄市',),

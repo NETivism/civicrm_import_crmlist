@@ -42,12 +42,12 @@ function civicrm_import_crmlist_settings($form_state){
   switch($form_state['storage']['step']) {
     case 1:
       $form['#attributes'] = array('enctype' => "multipart/form-data");
-      $form['step1']['#value'] = t('Step 1: Upload file');
+      $form['step1']['#value'] = t('步驟 1：上傳檔案');
 
       $form['upload'] = array(
         '#type' => 'file',
         '#title' => '選擇要轉換的檔案',
-        '#description' => t('Upload file should be Microsoft Excel(xls/xlsx) format file.'),
+        '#description' => t('上傳的檔案格式必須是 Microsoft Excel(xls/xlsx)'),
       );
 
       $form['submit'] = array(
@@ -58,7 +58,7 @@ function civicrm_import_crmlist_settings($form_state){
       break;
 
     case 2:
-      $form['step2']['#value'] = t('Step 2: Select each field format');
+      $form['step2']['#value'] = t('步驟 2: Select each field format');
       //$form_state['storage']['crmlist']
       $highestCol = $form_state['storage']['ColNum'];
       $index = 0;
@@ -68,14 +68,14 @@ function civicrm_import_crmlist_settings($form_state){
         $form['item_'.$index]['#value'] = '<tr align=center valign=center><td>'.$form_state['storage']['crmlist'][$index-1][1].'</td>';
         $form['firstrow_'.$index]['#value'] = '<td>'.$form_state['storage']['crmlist'][$index-1][2].'</td>';
 
-        $schemes = array('No action',
-          'Name',
+        $schemes = array('不轉換',
+          '姓名',
           'Email',
-          'BirthDay',
-          'Mobil',
-          'Telephone',
-          'Personal ID',
-          'Address',
+          '生日',
+          '手機號碼',
+          '電話號碼',
+          '身份證字號',
+          '地址',
         );
 
         // ´select´ form
