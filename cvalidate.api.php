@@ -107,17 +107,47 @@ function cvalidate_mobile($str) {
   if (empty($str)) {
     return FALSE;
   }
-  if (preg_match("/[-]/", $str)) { // check for english name
-    $str = str_replace('-', '', $str);
+  $append = '';
+  if (strstr($str, ',')) {
+    $str = str_replace(',', '#', $str);
   }
-  if (preg_match("/[+886]/", $str)) {
-    $str = str_replace('+886', '0', $str);
+  $number = $str;
+  if (strstr($str, '#')) {
+    list($number, $append) = explode('#', $str, 2);
+    $append = '#'. $append;
   }
-  if (strlen($str) != 10) {
+  if (preg_match("/^9/", $number)) {
+    // missing leading zero
+    $number = '0'.$number;
+  }
+  if (preg_match("/^0/", $number)) {
+    $num = preg_replace('/[^0-9-]/', '', $number);
+    if ($num != $number) {
+      return FALSE;
+    }
+    $num = preg_replace('/[^0-9]/', '', $number);
+    if (strlen($num) < 10) {
+      return FALSE;
+    }
+    $phone = $number; 
+  }
+  elseif (preg_match("/^+/", $number)) {
+    if (preg_match("/^+886-?/", $number)) {
+      $number = str_replace('+886', '0', $number);
+      $number = preg_replace('/[^0-9-]/', '', $number);
+      $phone = $number;
+    }
+    else {
+      $phone = $number;
+    }
+  }
+  else {
     return FALSE;
   }
-  $phone = substr($str, 1, 9);
-  $phone = '+886-' . $phone;
+  $phone .= $append;
+  if (!preg_match('/^[0+][0-9-]*(#.*)?$/u', $phone)) {
+    return FALSE;
+  }
   return $phone;
 }
 
@@ -130,18 +160,38 @@ function cvalidate_telephone($str) {
   if (empty($str)) {
     return FALSE;
   }
-  if (preg_match("/\-/", $str)) { // check for english name
-    $str = str_replace('-', '', $str);
+  if (strstr($str, ',')) {
+    $str = str_replace(',', '#', $str);
   }
-  if (preg_match("/\+886/", $str)) {
-    $str = str_replace('+886', '0', $str);
+  $number = $str;
+  if (strstr($str, '#')) {
+    list($number, $append) = explode('#', $str, 2);
+    $append = '#'. $append;
   }
-  $len = strlen($str);
-  if ($len < 9 || $len > 10) {
+  if (preg_match("/^0/", $number)) {
+    $num = preg_replace('/[^0-9-]/', '', $number);
+    if ($number != $num) {
+      return FALSE;
+    }
+    $phone = $number; 
+  }
+  elseif (preg_match("/^+/", $number)) {
+    if (preg_match("/^+886-?/", $number)) {
+      $number = str_replace('+886', '0', $number);
+      $number = preg_replace('/[^0-9-]/', '', $number);
+      $phone = $number;
+    }
+    else {
+      $phone = $number;
+    }
+  }
+  else {
     return FALSE;
   }
-  $phone = substr($str, 1, 9);
-  $phone = '+886-' . $phone;
+  $phone .= $append;
+  if (!preg_match('/^[0+][0-9-]*(#.*)?$/u', $phone)) {
+    return FALSE;
+  }
   return $phone;
 }
 
