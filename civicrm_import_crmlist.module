@@ -167,8 +167,8 @@ function civicrm_import_crmlist_settings_submit($form, &$form_state){
             break;
           case 1:  // Name
             if ($row_num == 1) {
-              $write_row[] = 'Family Name';
-              $write_row[] = 'First Name';
+              $write_row[] = '姓氏';
+              $write_row[] = '名字';
             }
             else {
               if(!empty($cell)) {
@@ -207,7 +207,7 @@ function civicrm_import_crmlist_settings_submit($form, &$form_state){
                     $new_cell['city'],
                     $new_cell['region'],
                   );
-                  if (is_array($cellContent['zip'])){ // 5-digit zip code
+                  if (is_array($new_cell['zip'])){ // 5-digit zip code
                     $addr[] = $new_cell['zip'][0];
                     $addr[] = $new_cell['zip'][1];
                   }
