@@ -139,6 +139,9 @@ function civicrm_import_crmlist_settings_submit($form, &$form_state){
         break;
       }
       foreach($row as $col_num => $cell) {
+        if (is_object($cell) && get_class($cell) == 'DateTime') {
+          $cell = $cell->format('Y-m-d H:i:s');
+        }
         $form_state['storage']['preview'][$col_num][$row_num] = $cell;
       }
     }
@@ -263,7 +266,6 @@ function civicrm_import_crmlist_settings_submit($form, &$form_state){
       $writer->addRow($write_row);
     }
     $writer->close();
-    exit();
   } // End if--step = 3
   return TRUE;
 }
