@@ -266,6 +266,7 @@ function civicrm_import_crmlist_settings_submit($form, &$form_state){
       $writer->addRow($write_row);
     }
     $writer->close();
+    exit();
   } // End if--step = 3
   return TRUE;
 }
